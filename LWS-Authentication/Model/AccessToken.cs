@@ -6,10 +6,8 @@ namespace LWS_Authentication.Model
 {
     public class AccessToken
     {
-        [BsonRepresentation(BsonType.Document)]
-        public DateTime CreatedAt { get; set; }
-        [BsonRepresentation(BsonType.Document)]
-        public DateTime ExpiresAt { get; set; }
+        public long CreatedAt { get; set; }
+        public long ExpiresAt { get; set; }
         public string Token { get; set; }
     }
 }

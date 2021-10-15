@@ -26,5 +26,12 @@ namespace LWS_Authentication.Repository
         /// <param name="accessToken">Access Token to Save.</param>
         /// <returns>Saved Access Token(which is identical to input accessToken)</returns>
         public Task<AccessToken> SaveAccessTokenAsync(string userEmail, AccessToken accessToken);
+        
+        /// <summary>
+        /// Authenticate ACCESS Token
+        /// </summary>
+        /// <param name="userToken">Token to find.</param>
+        /// <returns></returns>
+        public Task<Account> AuthenticateUserAsync(string userToken);
     }
 }

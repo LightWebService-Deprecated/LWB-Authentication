@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LWS_Authentication.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace LWS_Authentication.Repository
 {
@@ -47,6 +49,15 @@ namespace LWS_Authentication.Repository
             await _accountCollection.UpdateOneAsync(findOption, updateOption);
 
             return accessToken;
+        }
+
+        public async Task<Account> AuthenticateUserAsync(string userToken)
+        {
+            var findOption = Builders<Account>.Filter.And(
+                Builders<Account>.Filter.Eq("userAccessTokens.Token", userToken),
+                Builders<Account>.Filter.Gte("userAccessTokens.ExpiresAt", DateTimeOffset.UtcNow.ToUnixTimeSeconds()));
+
+            return await (await _accountCollection.FindAsync(findOption)).FirstOrDefaultAsync();
         }
     }
 }

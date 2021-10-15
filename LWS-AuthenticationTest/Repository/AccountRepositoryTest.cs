@@ -151,8 +151,8 @@ namespace LWS_AuthenticationTest.Repository
             // Do
             var accessToken = new AccessToken
             {
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddDays(20),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.UtcNow.AddDays(20).ToUnixTimeSeconds(),
                 Token = "testToken"
             };
             await _accountRepository.SaveAccessTokenAsync(mockUser.UserEmail, accessToken);
@@ -164,6 +164,58 @@ namespace LWS_AuthenticationTest.Repository
             Assert.Equal(accessToken.CreatedAt, accountList[0].UserAccessTokens[0].CreatedAt);
             Assert.Equal(accessToken.ExpiresAt, accountList[0].UserAccessTokens[0].ExpiresAt);
             Assert.Equal(accessToken.Token, accountList[0].UserAccessTokens[0].Token);
+        }
+
+        [Fact(DisplayName =
+            "AuthenticateUserAsync: AuthenticateUserAsync should return account token when succeed to find user.")]
+        public async void Is_AuthenticateUserAsync_Returns_AccessToken_When_Exists()
+        {
+            // Let
+            var mockUser = MockAccount;
+            var accessToken = new AccessToken
+            {
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.UtcNow.AddDays(20).ToUnixTimeSeconds(),
+                Token = "TEst"
+            };
+            mockUser.UserAccessTokens.Add(accessToken);
+            await _accountCollection.InsertOneAsync(mockUser);
+            
+            // Do
+            var result = await _accountRepository.AuthenticateUserAsync(accessToken.Token);
+            
+            // Check
+            Assert.NotNull(result);
+            Assert.Equal(mockUser.UserEmail, result.UserEmail);
+        }
+
+        [Fact(DisplayName =
+            "AuthenticateUserAsync: AuthenticateUserAsync should return null when failed to authenticate.")]
+        public async void Is_AuthenticateUserAsync_Returns_Null_When_Failed_To_Authenticate()
+        {
+            var result = await _accountRepository.AuthenticateUserAsync("accessToken.Token");
+            Assert.Null(result);
+        }
+
+        [Fact(DisplayName = "AuthenticateUserAsync: AuthenticateUserAsync should return null when token is expired")]
+        public async void Is_AuthenticateUserAsync_Returns_Null_When_Token_Is_Expired()
+        {
+            // Let
+            var mockUser = MockAccount;
+            var accessToken = new AccessToken
+            {
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.MinValue.ToUnixTimeSeconds(),
+                Token = "TEst"
+            };
+            mockUser.UserAccessTokens.Add(accessToken);
+            await _accountCollection.InsertOneAsync(mockUser);
+            
+            // Do
+            var result = await _accountRepository.AuthenticateUserAsync(accessToken.Token);
+            
+            // Check
+            Assert.Null(result);
         }
     }
 }

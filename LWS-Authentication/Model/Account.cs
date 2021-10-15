@@ -34,5 +34,15 @@ namespace LWS_Authentication.Model
         /// </summary>
         [BsonElement("userAccessTokens")]
         public List<AccessToken> UserAccessTokens { get; set; }
+
+        public AccountProjection ToProjection() => new AccountProjection
+        {
+            UserEmail = this.UserEmail
+        };
+    }
+
+    public class AccountProjection
+    {
+        public string UserEmail { get; set; }
     }
 }

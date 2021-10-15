@@ -28,7 +28,12 @@ message LoginRequestMessage {
   string userPassword = 2;
 }
 
+message AuthenticateUserMessage {
+  string userToken = 1;
+}
+
 service AuthenticationRpc {
   rpc RegisterRequest (RegisterRequestMessage) returns (Result);
   rpc LoginRequest (LoginRequestMessage) returns (Result);
+  rpc AuthenticateUserRequest (AuthenticateUserMessage) returns (Result);
 }

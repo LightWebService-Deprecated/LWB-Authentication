@@ -62,6 +62,26 @@ namespace LWS_Authentication
             };
         }
 
+        public override async Task<Result> AuthenticateUserRequest(AuthenticateUserMessage request, ServerCallContext context)
+        {
+            var result = await _accountRepository.AuthenticateUserAsync(request.UserToken);
+
+            if (result == null)
+            {
+                return new Result
+                {
+                    ResultCode = ResultCode.Forbidden,
+                    Message = $"Access Token expired or not-found! Please re-login."
+                };
+            }
+
+            return new Result
+            {
+                ResultCode = ResultCode.Success,
+                Content = JsonConvert.SerializeObject(result.ToProjection())
+            };
+        }
+
         private AccessToken CreateAccessToken(Account account)
         {
             using var shaManaged = new SHA512Managed();
@@ -71,8 +91,8 @@ namespace LWS_Authentication
 
             return new AccessToken
             {
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
                 Token = BitConverter.ToString(result).Replace("-", string.Empty)
             };
         }

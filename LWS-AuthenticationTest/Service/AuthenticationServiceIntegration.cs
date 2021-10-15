@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Grpc.Net.Client;
 using LWS_Authentication;
 using LWS_Authentication.Configuration;
@@ -38,6 +39,13 @@ namespace LWS_AuthenticationTest.Service
             // Create object
             _authenticationService = new AuthenticationService(NullLogger<AuthenticationService>.Instance, new AccountRepository(_mongoContext));
         }
+        
+        private Account MockAccount => new Account
+        {
+            UserEmail = Guid.NewGuid().ToString(),
+            UserPassword = Guid.NewGuid().ToString(),
+            UserAccessTokens = new List<AccessToken>()
+        };
 
         public void Dispose()
         {
@@ -120,6 +128,44 @@ namespace LWS_AuthenticationTest.Service
             Assert.Equal(ResultCode.Success, result.ResultCode);
             var objectReturned = JsonConvert.DeserializeObject<AccessToken>(result.Content);
             Assert.NotNull(objectReturned);
+        }
+
+        [Fact(DisplayName =
+            "AuthenticateUserRequest: AuthenticateUserRequest should return succeeds and account info when authenticating succeeds.")]
+        public async void Is_AuthenticateUserRequest_Returns_Succeeds()
+        {
+            // Let
+            var mockUser = MockAccount;
+            var accessToken = new AccessToken
+            {
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.UtcNow.AddDays(10).ToUnixTimeSeconds(),
+                Token = "TEst"
+            };
+            mockUser.UserAccessTokens.Add(accessToken);
+            await _accountCollection.InsertOneAsync(mockUser);
+            
+            // Do
+            var result =
+                await _authenticationService.AuthenticateUserRequest(
+                    new AuthenticateUserMessage {UserToken = accessToken.Token}, null);
+            
+            // Check
+            Assert.Equal(ResultCode.Success, result.ResultCode);
+            var objectJson = JsonConvert.DeserializeObject<AccountProjection>(result.Content);
+            Assert.NotNull(objectJson);
+            Assert.Equal(objectJson.UserEmail, mockUser.UserEmail);
+        }
+
+        [Fact(DisplayName =
+            "AuthenticateUserRequest: AuthenticateUserRequest should return forbidden when either token is expired or not exists.")]
+        public async void Is_AuthenticateUserRequest_Returns_Null_When_Token_Expired()
+        {
+            var result =
+                await _authenticationService.AuthenticateUserRequest(
+                    new AuthenticateUserMessage {UserToken = "accessToken.Token"}, null);
+            
+            Assert.Equal(ResultCode.Forbidden, result.ResultCode);
         }
     }
 }
