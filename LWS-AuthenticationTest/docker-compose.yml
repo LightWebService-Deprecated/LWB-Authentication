@@ -1,0 +1,12 @@
+
+version: "3.2"
+
+services:
+  mongodb_runner:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: testPassword
+    container_name: "test_mongo_runner"
+    ports:
+      - 27017:27017
