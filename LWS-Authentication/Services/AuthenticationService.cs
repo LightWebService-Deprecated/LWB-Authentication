@@ -53,12 +53,16 @@ namespace LWS_Authentication
                     Message = "Login failed! Please check your email or password."
                 };
             }
-            
+
+            var accessToken = CreateAccessToken(loginResult);
+
+            await _accountRepository.SaveAccessTokenAsync(loginResult.UserEmail, accessToken);
+
             // Login Succeeds. Create Access Token
             return new Result
             {
                 ResultCode = ResultCode.Success,
-                Content = JsonConvert.SerializeObject(CreateAccessToken(loginResult))
+                Content = JsonConvert.SerializeObject(accessToken)
             };
         }
 

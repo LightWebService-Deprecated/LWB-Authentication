@@ -113,7 +113,7 @@ namespace LWS_AuthenticationTest.Service
         public async void Is_LoginRequest_Works_Well()
         {
             // Let
-            var targetAccount = new Account {UserEmail = Guid.NewGuid().ToString(), UserPassword = Guid.NewGuid().ToString()};
+            var targetAccount = new Account {UserEmail = Guid.NewGuid().ToString(), UserPassword = Guid.NewGuid().ToString(), UserAccessTokens = new List<AccessToken>()};
             await _accountCollection.InsertOneAsync(targetAccount);
             
             // Do
