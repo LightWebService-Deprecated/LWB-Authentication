@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using LWS_Authentication.Model;
 using LWS_Authentication.Repository;
+using LWS_Shared;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Newtonsoft.Json;

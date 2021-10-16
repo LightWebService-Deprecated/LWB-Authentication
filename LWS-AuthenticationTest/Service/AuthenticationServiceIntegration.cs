@@ -5,6 +5,7 @@ using LWS_Authentication;
 using LWS_Authentication.Configuration;
 using LWS_Authentication.Model;
 using LWS_Authentication.Repository;
+using LWS_Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
