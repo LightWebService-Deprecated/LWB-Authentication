@@ -106,6 +106,7 @@ namespace LWS_Authentication
         [ExcludeFromCodeCoverage]
         private Result HandleRegisterError(Exception superException, RegisterRequestMessage toRegister)
         {
+            _logger.LogCritical($"Exception Occurred! Message: {superException.Message}");
             // When Error type is MongoWriteException
             if (superException is MongoWriteException mongoWriteException)
             {
