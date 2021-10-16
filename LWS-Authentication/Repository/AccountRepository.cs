@@ -59,5 +59,12 @@ namespace LWS_Authentication.Repository
 
             return await (await _accountCollection.FindAsync(findOption)).FirstOrDefaultAsync();
         }
+
+        public async Task DropoutUserAsync(string userEmail)
+        {
+            var filter = Builders<Account>.Filter.Eq(a => a.UserEmail, userEmail);
+
+            await _accountCollection.DeleteOneAsync(filter);
+        }
     }
 }

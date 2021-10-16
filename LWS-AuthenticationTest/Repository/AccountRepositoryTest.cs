@@ -217,5 +217,26 @@ namespace LWS_AuthenticationTest.Repository
             // Check
             Assert.Null(result);
         }
+
+        [Fact(DisplayName = "DropoutUserAsync: DropoutUserAsync should remove user well.")]
+        public async void Is_DropoutUserAsync_Removes_User_Well()
+        {
+            // Let
+            var mockUser = MockAccount;
+            var accessToken = new AccessToken
+            {
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ExpiresAt = DateTimeOffset.MinValue.ToUnixTimeSeconds(),
+                Token = "TEst"
+            };
+            mockUser.UserAccessTokens.Add(accessToken);
+            
+            // Do
+            await _accountRepository.DropoutUserAsync(mockUser.UserEmail);
+            
+            // Check
+            var list = await GetAllAccountListAsync();
+            Assert.Empty(list);
+        }
     }
 }

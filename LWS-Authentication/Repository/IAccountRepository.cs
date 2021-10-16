@@ -33,5 +33,12 @@ namespace LWS_Authentication.Repository
         /// <param name="userToken">Token to find.</param>
         /// <returns></returns>
         public Task<Account> AuthenticateUserAsync(string userToken);
+
+        /// <summary>
+        /// Remove account from user repository.
+        /// </summary>
+        /// <param name="userEmail">User Identifier</param>
+        /// <returns>None.</returns>
+        public Task DropoutUserAsync(string userEmail);
     }
 }

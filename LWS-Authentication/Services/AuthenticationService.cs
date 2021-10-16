@@ -87,6 +87,16 @@ namespace LWS_Authentication
             };
         }
 
+        public override async Task<Result> DropoutUserRequest(DropoutUserMessage request, ServerCallContext context)
+        {
+            await _accountRepository.DropoutUserAsync(request.UserEmail);
+
+            return new Result
+            {
+                ResultCode = ResultCode.Success
+            };
+        }
+
         private AccessToken CreateAccessToken(Account account)
         {
             using var shaManaged = new SHA512Managed();

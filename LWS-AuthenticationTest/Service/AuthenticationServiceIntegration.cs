@@ -168,5 +168,21 @@ namespace LWS_AuthenticationTest.Service
             
             Assert.Equal(ResultCode.Forbidden, result.ResultCode);
         }
+
+        [Fact(DisplayName =
+            "DropoutUserRequest: DropoutUserRequest should return succeeds when user successfully removed.")]
+        public async void Is_DropoutUserRequest_Returns_Succeeds_When_User_Removed()
+        {
+            // Let
+            var account = MockAccount;
+            await _accountCollection.InsertOneAsync(account);
+            
+            // Do
+            var result =
+                await _authenticationService.DropoutUserRequest(new DropoutUserMessage {UserEmail = account.UserEmail}, null);
+            
+            // Check
+            Assert.Equal(ResultCode.Success, result.ResultCode);
+        }
     }
 }
